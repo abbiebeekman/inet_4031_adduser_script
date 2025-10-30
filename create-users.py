@@ -27,9 +27,9 @@ def main():
             continue
 
         # Extract user information from the fields
-        username = fields[0]  # Username for the new account
-        password = fields[1]  # Password to be set
-        gecos = "%s %s,,," % (fields[3], fields[2])  # Full name and other info for GECOS field
+        username = fields[0]
+        password = fields[1]
+        gecos = "%s %s,,," % (fields[3], fields[2])
 
         # Split the group field into a list of groups
         groups = fields[4].split(',')
@@ -40,9 +40,8 @@ def main():
         # Construct the command to add a user with disabled password and GECOS info
         cmd = "/usr/sbin/adduser --disabled-password --gecos '%s' %s" % (gecos, username)
 
-        # Uncomment to execute user creation command
-        # print(cmd)
-        # os.system(cmd)
+        print(cmd)
+        os.system(cmd)
 
         # Notify that password is being set
         print("==> Setting the password for %s..." % (username))
@@ -50,17 +49,16 @@ def main():
         # Construct the command to set the user's password using echo and passwd
         cmd = "/bin/echo -ne '%s\n%s' | /usr/bin/sudo /usr/bin/passwd %s" % (password, password, username)
 
-        # Uncomment to execute password setting command
-        # print(cmd)
-        # os.system(cmd)
+        print(cmd)
+        os.system(cmd)
 
         # Assign user to specified groups unless group is '-'
         for group in groups:
             if group != '-':
                 print("==> Assigning %s to the %s group..." % (username, group))
                 cmd = "/usr/sbin/adduser %s %s" % (username, group)
-                # print(cmd)
-                # os.system(cmd)
+                print(cmd)
+                os.system(cmd)
 
 # Entry point of the script
 if __name__ == '__main__':
