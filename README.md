@@ -2,22 +2,58 @@
 
 ## Program Description
 
-Detailed and helpful description paragraph goes here.  Describe how the program will help the user.  It should talk about how the program is an automated way for the user to accomplish the manual task of adding users. Also include a description of what commands a user would normally use to add a user and then describe how those ***SAME COMMANDS*** are used by the script and automated.
+The Add Users Script is designed to automate the process of adding multiple users to a Linux system using an input file. Normally, a system administrator must manually enter a series of commands such as adduser, passwd, and adduser <username> <group> to create new users, set their passwords, and assign them to groups. This script automates those same commands by reading user information from an input file and executing the appropriate system commands for each entry.
+
+By automating this task, the script helps reduce manual typing, minimize human error, and speed up the process of onboarding new users in bulk. The script essentially takes care of performing the same operations an administrator would do manually, but in a batch, repeatable, and consistent manner.
 
 ## Program User Operation
 
-This section should describe the overall operation of the program. After reading this section user should know what to do to make it work.  Let the comments in your code explain "how" it work.
+The program reads user information line by line from an input file (redirected into the script’s standard input) and creates system accounts accordingly. Each line in the file represents a user to be created, along with their password, name information, and group memberships.
 
-This section should start off with a paragraph description, then have subsections for the following:
+Before running the script, ensure it has executable permissions. During execution, the script will either print out what it would do (in a "dry run") or actually perform the commands to add users, depending on how it’s configured.
 
 ### Input File Format
-Explain the format of the input file.  What is the purpose of each field in a line.
-Explain what the user needs to do if they want to skip a line in the input file.
-Expalin what the user needs to do if they do not want a new user added to any groups.
+Each line in the input file should contain five colon-separated fields, in the following format:
+username:password:last_name:first_name:groups
+
+Field descriptions:
+- username — The desired login name for the new user.
+- password — The user’s password (entered in plain text).
+- last_name — The user’s last name.
+- first_name — The user’s first name.
+- groups — A comma-separated list of groups to which the user should be added. Use a dash (-) if the user should not be added to any additional groups.
+
+Comments and blank lines:
+- Any line beginning with a # character is treated as a comment and skipped.
+- Blank lines or lines with missing fields (anything not containing exactly five colon-separated values) are ignored.
+
+To skip a user:
+Simply comment out their line by adding a # at the start of it.
+
+To omit group assignment:
+Use - in the groups field.
 
 ### Command Excuction
-Explain how the user runs the code.  Remind the user they may need to set the Python file to be executable.
-./create-users.py < createusers.input
+To run the script, ensure it is executable and that you have sufficient privileges (typically root or via sudo). Then, use the following command syntax:
+
+`chmod +x create-users.py
+./create-users.py < createusers.input`
+
+The script reads from standard input, so it’s important to use input redirection (<) to feed in your user list file.
+
+Behind the scenes, the script uses these Linux commands:
+- `/usr/sbin/adduser` — to create the user account.
+- `/usr/bin/passwd` — to set the user’s password.
+- `/usr/sbin/adduser` <username> <group> — to add the user to one or more groups.
+
+Each command is constructed dynamically from the input file fields and executed via os.system() calls (once uncommented for production use).
 
 ### "Dry Run"
-Explain what happens if the user elects to do a "dry run."  
+When first testing the script, you should leave the os.system() calls commented out. In this "dry run" mode, the script will print out the commands it intends to execute rather than actually running them.
+
+This allows you to:
+- Verify that your input file is correctly formatted.
+- Check the exact commands that would be executed on the system.
+- Ensure there are no syntax or logic errors before performing real user creation.
+
+Once you’re satisfied with the dry run output, you can uncomment the os.system(cmd) lines to enable actual execution of the commands.
